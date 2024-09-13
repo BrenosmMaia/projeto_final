@@ -1,0 +1,3 @@
+pergunta_base,pergunta_match,ratio,partial_ratio,token_set_ratio,partial_token_set_ratio,token_sort_ratio,partial_token_sort_ratio,token_ratio,partial_token_ratio,WRatio
+acesso ao SIPLAG,Não tenho acesso ao SIPLAG. Como solicitar?,True,True,True,False,True,True,True,False,True
+como definir um objetivo?,Como elaborar o objetivo de uma iniciativa?,False,False,True,False,True,False,True,False,False
