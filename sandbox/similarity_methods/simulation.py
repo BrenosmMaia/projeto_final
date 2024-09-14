@@ -1,7 +1,6 @@
 import json
-import pandas as pd
-
 from typing import Dict, List, Tuple
+import pandas as pd
 from rapidfuzz import fuzz, process, utils
 
 
@@ -15,28 +14,25 @@ def read_input() -> Dict[str, str]:
 
 def create_match_dataframe(
     data_list: List[Dict[str, List[Tuple[str, int]]]],
-    pergunta_base_e_match: Dict[str, str]
+    pergunta_base_e_match: Dict[str, str],
 ) -> pd.DataFrame:
     """Creates a DataFrame with the results of the matching process"""
 
     def check_match(tuple_list, pergunta_match):
         return any(pergunta_match == item[0] for item in tuple_list)
-    
+
     results = []
-    
+
     for data, (pergunta_base, pergunta_match) in zip(data_list, pergunta_base_e_match):
-        result = {
-            'pergunta_base': pergunta_base,
-            'pergunta_match': pergunta_match
-        }
-        
+        result = {"pergunta_base": pergunta_base, "pergunta_match": pergunta_match}
+
         for ratio_func, tuple_list in data.items():
             result[ratio_func] = check_match(tuple_list, pergunta_match)
-        
+
         results.append(result)
-    
+
     df = pd.DataFrame(results)
-    
+
     return df
 
 
@@ -54,14 +50,26 @@ def main():
         fuzz.partial_token_sort_ratio,
         fuzz.token_ratio,
         fuzz.partial_token_ratio,
-        fuzz.WRatio
+        fuzz.WRatio,
     )
-    
+
     results = []
     for i in questions_and_expected:
-        results.append({score.__name__: process.extract(i[0], questions_faq, scorer=score, limit=2, processor=utils.default_process) for score in scoares})
+        results.append(
+            {
+                score.__name__: process.extract(
+                    i[0],
+                    questions_faq,
+                    scorer=score,
+                    limit=2,
+                    processor=utils.default_process,
+                )
+                for score in scoares
+            }
+        )
 
     df = create_match_dataframe(results, questions_and_expected)
-    df.to_csv('output.csv', index=False)
+    df.to_csv("output.csv", index=False)
+
 
 main()
