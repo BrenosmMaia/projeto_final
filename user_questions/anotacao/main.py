@@ -89,6 +89,7 @@ def main():
         )
 
     final_df = process_similarity_results(wpp_questions, results)
+    final_df["pergunta_wpp"] = range(1, len(final_df) + 1)
 
     final_df.to_csv("anotacao_output.csv", index=False)
 
