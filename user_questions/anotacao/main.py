@@ -52,13 +52,13 @@ def process_similarity_results(
 
 
 def main():
-    df_faq_and_users = pd.read_excel(
+    df_faq_users = pd.read_excel(
         io="../../data/Perguntas_chatbot - 09.10_v4.xlsx", sheet_name="ANOTACAO"
     )
 
-    df_faq_and_users = fix_excel_table(df_faq_and_users)
-    wpp_questions = df_faq_and_users["pergunta_wpp"].tolist()
-    faq = df_faq_and_users["pergunta_faq"].tolist()
+    df_faq_users = fix_excel_table(df_faq_users)
+    wpp_questions = df_faq_users["pergunta_wpp"].dropna().tolist()
+    faq = df_faq_users["pergunta_faq"].dropna().tolist()
 
     scoares = (
         fuzz.ratio,
@@ -74,7 +74,6 @@ def main():
 
     results = []
 
-    j = 0
     for i in wpp_questions:
         results.append(
             {
@@ -89,15 +88,8 @@ def main():
             }
         )
 
-        j = j + 1
-        if j >= 3:
-            break
+    final_df = process_similarity_results(wpp_questions, results)
 
-        print(results)
-        print("\n")
-        final_df = process_similarity_results(wpp_questions, results)
-
-        print(final_df)
-
+    final_df.to_csv("anotacao_output.csv", index=False)
 
 main()
