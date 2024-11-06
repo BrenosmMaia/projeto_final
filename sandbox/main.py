@@ -19,35 +19,48 @@ def make_json_output(
 
     sorted_data = sorted(data, key=lambda x: x[1], reverse=True)
 
-    result = {item[0]: round(item[1], 5) for item in sorted_data}
+    result = {item[0]: round(item[1], 4) for item in sorted_data}
 
     with open(filename, "w", encoding="utf-8") as f:
         json.dump(result, f, ensure_ascii=False, indent=4)
 
 
+def calculate_similarity(question, questions_faq):
+    scorers = (
+        fuzz.ratio,
+        fuzz.partial_ratio,
+        fuzz.token_sort_ratio,
+        fuzz.token_set_ratio,
+        fuzz.token_ratio,
+        fuzz.partial_token_sort_ratio,
+        fuzz.partial_token_set_ratio,
+        fuzz.partial_token_ratio,
+        fuzz.WRatio,
+        fuzz.QRatio,
+    )
+
+    for scorer in scorers:
+        scorer_name = scorer.__name__
+        results = process.extract(
+            question,
+            questions_faq,
+            scorer=scorer,
+            limit=5,
+            processor=utils.default_process,
+        )
+        filename = f"output_{scorer_name}.json"
+        make_json_output(results, filename)
+
+
 def main():
     question = read_input()["pergunta"]
 
-    questions_df = pd.read_excel(io="../data/perguntas_chatbot_v1.xlsx")
-    questions_faq = questions_df["perguntas"].tolist()
-
-    ratio_results = process.extract(
-        question,
-        questions_faq,
-        scorer=fuzz.ratio,
-        limit=None,
-        processor=utils.default_process,
+    questions_df = pd.read_excel(
+        io="../data/Perguntas_chatbot - 09.10_relacao FAQ perguntas users.xlsx"
     )
-    token_set_ratio_results = process.extract(
-        question,
-        questions_faq,
-        scorer=fuzz.token_set_ratio,
-        limit=None,
-        processor=utils.default_process,
-    )
+    questions_faq = questions_df["PERGUNTA FAQ"].tolist()
 
-    make_json_output(ratio_results, "output_ratio.json")
-    make_json_output(token_set_ratio_results, "output_token_set_ratio.json")
+    calculate_similarity(question, questions_faq)
 
 
 if __name__ == "__main__":
