@@ -10,7 +10,8 @@ def fix_excel_table(df: pd.DataFrame) -> pd.DataFrame:
         columns={
             df.columns[0]: "n_wpp_questions",
             df.columns[1]: "pergunta_wpp",
-            df.columns[3]: "n_faq_question",
+            df.columns[2]: "wpp_to_faq_annotation",
+            df.columns[4]: "n_faq_question",
             df.columns[5]: "pergunta_faq",
         }
     )
@@ -51,9 +52,23 @@ def process_similarity_results(
     return df[columns]
 
 
+def make_output_csv(df: pd.DataFrame, df_faq_users: pd.DataFrame) -> pd.DataFrame:
+    """Process output"""
+
+    df["pergunta_wpp"] = range(1, len(df) + 1)
+    df = pd.concat(
+        [df, df_faq_users["wpp_to_faq_annotation"].dropna(how="all")], axis=1
+    )
+    last_col = df.pop("wpp_to_faq_annotation")
+    df.insert(1, "wpp_to_faq_annotation", last_col)
+
+    df.to_csv("anotacao_output.csv", index=False)
+
+
 def main():
     df_faq_users = pd.read_excel(
-        io="../../data/Perguntas_chatbot - 09.10_v4.xlsx", sheet_name="ANOTACAO"
+        io="../../data/Perguntas_chatbot - 09.10_relacao FAQ perguntas users.xlsx",
+        sheet_name="relacao",
     )
 
     df_faq_users = fix_excel_table(df_faq_users)
@@ -63,13 +78,14 @@ def main():
     scoares = (
         fuzz.ratio,
         fuzz.partial_ratio,
-        fuzz.token_set_ratio,
-        fuzz.partial_token_set_ratio,
         fuzz.token_sort_ratio,
-        fuzz.partial_token_sort_ratio,
+        fuzz.token_set_ratio,
         fuzz.token_ratio,
+        fuzz.partial_token_sort_ratio,
+        fuzz.partial_token_set_ratio,
         fuzz.partial_token_ratio,
         fuzz.WRatio,
+        fuzz.QRatio,
     )
 
     results = []
@@ -89,8 +105,7 @@ def main():
         )
 
     final_df = process_similarity_results(wpp_questions, results)
-    final_df["pergunta_wpp"] = range(1, len(final_df) + 1)
+    make_output_csv(final_df, df_faq_users)
 
-    final_df.to_csv("anotacao_output.csv", index=False)
 
 main()
