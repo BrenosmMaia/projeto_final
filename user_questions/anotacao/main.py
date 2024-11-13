@@ -1,6 +1,7 @@
 from typing import Dict, List, Tuple
 import pandas as pd
 from rapidfuzz import fuzz, process, utils
+from methods_score import calculate_scores
 
 
 def fix_excel_table(df: pd.DataFrame) -> pd.DataFrame:
@@ -62,7 +63,7 @@ def make_output_csv(df: pd.DataFrame, df_faq_users: pd.DataFrame) -> pd.DataFram
     last_col = df.pop("wpp_to_faq_annotation")
     df.insert(1, "wpp_to_faq_annotation", last_col)
 
-    df.to_csv("anotacao_output.csv", index=False)
+    return df
 
 
 def main():
@@ -105,7 +106,12 @@ def main():
         )
 
     final_df = process_similarity_results(wpp_questions, results)
-    make_output_csv(final_df, df_faq_users)
+    final_df = make_output_csv(final_df, df_faq_users)
+
+    final_df.to_csv("anotacao_output.csv", index=False)
+
+    scores = calculate_scores(final_df)
+    scores.to_csv("scores.csv", index=False)
 
 
 main()
