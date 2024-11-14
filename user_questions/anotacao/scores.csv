@@ -1,11 +1,11 @@
 similarity_method,score,right_questions
-token_ratio,9,"[2, 4, 7, 8, 13, 16, 17, 18, 27]"
-token_set_ratio,9,"[2, 4, 7, 8, 13, 16, 17, 18, 27]"
-partial_token_sort_ratio,7,"[2, 7, 8, 16, 20, 28, 39]"
-partial_ratio,6,"[2, 4, 7, 27, 38, 46]"
-ratio,3,"[8, 14, 45]"
-QRatio,3,"[8, 14, 45]"
-token_sort_ratio,2,"[8, 21]"
-partial_token_set_ratio,1,[20]
-partial_token_ratio,1,[20]
-WRatio,1,[20]
+partial_ratio,9,"[2, 7, 18, 20, 27, 28, 30, 40, 42]"
+token_set_ratio,9,"[2, 3, 4, 7, 8, 16, 18, 27, 45]"
+partial_token_sort_ratio,9,"[4, 7, 18, 20, 27, 28, 40, 45, 46]"
+token_ratio,9,"[2, 3, 4, 7, 8, 16, 18, 27, 45]"
+token_sort_ratio,3,"[3, 4, 8]"
+ratio,2,"[8, 14]"
+partial_token_set_ratio,2,"[20, 28]"
+partial_token_ratio,2,"[20, 28]"
+WRatio,2,"[20, 28]"
+QRatio,2,"[8, 14]"
