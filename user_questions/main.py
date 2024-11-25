@@ -1,11 +1,9 @@
-import json
-from typing import Dict, List, Tuple
 import pandas as pd
 from rapidfuzz import fuzz, process, utils
 
 
 def create_dataframe(
-    user_questions: List[str], results: List[Dict[str, List[Tuple[str, float, int]]]]
+    user_questions: list[str], results: list[dict[str, list[tuple[str, float, int]]]]
 ) -> pd.DataFrame:
     """CreateS a DataFrame from the results of the matching process."""
 

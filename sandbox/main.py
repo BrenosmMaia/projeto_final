@@ -1,19 +1,19 @@
 import json
-from typing import Dict, List, Tuple
+
 import pandas as pd
 from rapidfuzz import fuzz, process, utils
 
 
-def read_input() -> Dict[str, str]:
+def read_input() -> dict[str, str]:
     """Reads the input question from a json file"""
 
-    with open("input.json", "r", encoding="utf-8") as file:
+    with open("input.json", encoding="utf-8") as file:
         data = json.load(file)
     return data
 
 
 def make_json_output(
-    data: List[Tuple[str, float, int]], filename: str = "output.json"
+    data: list[tuple[str, float, int]], filename: str = "output.json"
 ) -> None:
     """Converts and sorts the output from rapidfuzz.process"""
 

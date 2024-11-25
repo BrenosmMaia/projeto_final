@@ -1,14 +1,15 @@
-from typing import Dict, List, Tuple
-import pandas as pd
-from rapidfuzz import fuzz, process, utils
-from methods_score import calculate_scores
-import nltk
-from nltk.corpus import stopwords
 import re
+
+import nltk
+import pandas as pd
+from methods_score import calculate_scores
+from nltk.corpus import stopwords
+from rapidfuzz import fuzz, process, utils
 
 
 def fix_excel_table(df: pd.DataFrame) -> pd.DataFrame:
-    """Apply fixes such as renaming columns and changing data types to the given DataFrame."""
+    """Apply fixes such as renaming columns and changing data
+    types to the given DataFrame."""
 
     df = df.rename(
         columns={
@@ -28,7 +29,7 @@ def fix_excel_table(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def process_similarity_results(
-    wpp_questions: List[str], results: List[Dict[str, List[Tuple[str, float, int]]]]
+    wpp_questions: list[str], results: list[dict[str, list[tuple[str, float, int]]]]
 ) -> pd.DataFrame:
     """
     Process similarity results into a structured DataFrame with dynamic scoring methods
@@ -69,8 +70,10 @@ def make_output_csv(df: pd.DataFrame, df_faq_users: pd.DataFrame) -> pd.DataFram
     return df
 
 
-def remove_stopwords(strings: List[str]) -> List[str]:
-    """Removes Portuguese stopwords, greetings and punctuation (except ?) from a list of strings."""
+def remove_stopwords(strings: list[str]) -> list[str]:
+    """Removes Portuguese stopwords, greetings and punctuation (except ?)
+    from a list of strings."""
+
     try:
         stop_words = set(stopwords.words("portuguese"))
     except LookupError:
