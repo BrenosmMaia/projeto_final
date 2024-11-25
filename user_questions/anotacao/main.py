@@ -2,6 +2,9 @@ from typing import Dict, List, Tuple
 import pandas as pd
 from rapidfuzz import fuzz, process, utils
 from methods_score import calculate_scores
+import nltk
+from nltk.corpus import stopwords
+import re
 
 
 def fix_excel_table(df: pd.DataFrame) -> pd.DataFrame:
@@ -66,6 +69,30 @@ def make_output_csv(df: pd.DataFrame, df_faq_users: pd.DataFrame) -> pd.DataFram
     return df
 
 
+def remove_stopwords(strings: List[str]) -> List[str]:
+    """Removes Portuguese stopwords, greetings and punctuation (except ?) from a list of strings."""
+    try:
+        stop_words = set(stopwords.words("portuguese"))
+    except LookupError:
+        nltk.download("stopwords", quiet=True)
+        stop_words = set(stopwords.words("portuguese"))
+
+    greetings = {"bom dia", "boa tarde", "boa noite"}
+
+    def clean_text(text: str) -> str:
+        text_lower = text.lower()
+        for greeting in greetings:
+            text_lower = re.sub(f"{greeting}[!.,]?", "", text_lower)
+        text_lower = re.sub(r"[^\w\s\?]", "", text_lower)
+        return " ".join(
+            word
+            for word in text_lower.split()
+            if word not in stop_words and word.strip()
+        ).strip()
+
+    return [clean_text(text) for text in strings]
+
+
 def main():
     df_faq_users = pd.read_excel(
         io="../../data/Perguntas_chatbot - 09.10_relacao FAQ perguntas users.xlsx",
@@ -73,8 +100,8 @@ def main():
     )
 
     df_faq_users = fix_excel_table(df_faq_users)
-    wpp_questions = df_faq_users["pergunta_wpp"].dropna().tolist()
-    faq = df_faq_users["pergunta_faq"].dropna().tolist()
+    wpp_questions = remove_stopwords(df_faq_users["pergunta_wpp"].dropna().tolist())
+    faq = remove_stopwords(df_faq_users["pergunta_faq"].dropna().tolist())
 
     scoares = (
         fuzz.ratio,
