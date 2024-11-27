@@ -1,31 +1,11 @@
-import re
+import os
+import sys
 
-import nltk
 import pandas as pd
-from methods_score import calculate_scores
-from nltk.corpus import stopwords
+
+sys.path.append(os.path.dirname(os.path.dirname(__file__)))
 from rapidfuzz import fuzz, process, utils
-
-
-def fix_excel_table(df: pd.DataFrame) -> pd.DataFrame:
-    """Apply fixes such as renaming columns and changing data
-    types to the given DataFrame."""
-
-    df = df.rename(
-        columns={
-            df.columns[0]: "n_wpp_questions",
-            df.columns[1]: "pergunta_wpp",
-            df.columns[2]: "wpp_to_faq_annotation",
-            df.columns[4]: "n_faq_question",
-            df.columns[5]: "pergunta_faq",
-        }
-    )
-
-    df["n_wpp_questions"] = df["n_wpp_questions"].fillna(-1).astype(int)
-
-    df = df.drop(df.columns[3], axis=1)
-
-    return df
+from utils import calculate_scores, fix_excel_table, remove_stopwords
 
 
 def process_similarity_results(
@@ -39,7 +19,7 @@ def process_similarity_results(
     scoring_methods = results[0].keys()
 
     for question, result in zip(wpp_questions, results):
-        row_data = {"pergunta_wpp": question}
+        row_data = {"wpp_question": question}
 
         for score_name in scoring_methods:
             matched_text, score, index = result[score_name][0]
@@ -50,7 +30,7 @@ def process_similarity_results(
 
     df = pd.DataFrame(processed_data)
 
-    columns = ["pergunta_wpp"]
+    columns = ["wpp_question"]
     for score_name in scoring_methods:
         columns.extend([f"{score_name}_question", f"{score_name}_value"])
 
@@ -60,7 +40,7 @@ def process_similarity_results(
 def make_output_csv(df: pd.DataFrame, df_faq_users: pd.DataFrame) -> pd.DataFrame:
     """Process output"""
 
-    df["pergunta_wpp"] = range(1, len(df) + 1)
+    df["wpp_question"] = range(1, len(df) + 1)
     df = pd.concat(
         [df, df_faq_users["wpp_to_faq_annotation"].dropna(how="all")], axis=1
     )
@@ -70,32 +50,6 @@ def make_output_csv(df: pd.DataFrame, df_faq_users: pd.DataFrame) -> pd.DataFram
     return df
 
 
-def remove_stopwords(strings: list[str]) -> list[str]:
-    """Removes Portuguese stopwords, greetings and punctuation (except ?)
-    from a list of strings."""
-
-    try:
-        stop_words = set(stopwords.words("portuguese"))
-    except LookupError:
-        nltk.download("stopwords", quiet=True)
-        stop_words = set(stopwords.words("portuguese"))
-
-    greetings = {"bom dia", "boa tarde", "boa noite"}
-
-    def clean_text(text: str) -> str:
-        text_lower = text.lower()
-        for greeting in greetings:
-            text_lower = re.sub(f"{greeting}[!.,]?", "", text_lower)
-        text_lower = re.sub(r"[^\w\s\?]", "", text_lower)
-        return " ".join(
-            word
-            for word in text_lower.split()
-            if word not in stop_words and word.strip()
-        ).strip()
-
-    return [clean_text(text) for text in strings]
-
-
 def main():
     df_faq_users = pd.read_excel(
         io="../../data/Perguntas_chatbot - 09.10_relacao FAQ perguntas users.xlsx",
@@ -103,7 +57,7 @@ def main():
     )
 
     df_faq_users = fix_excel_table(df_faq_users)
-    wpp_questions = remove_stopwords(df_faq_users["pergunta_wpp"].dropna().tolist())
+    wpp_questions = remove_stopwords(df_faq_users["wpp_question"].dropna().tolist())
     faq = remove_stopwords(df_faq_users["pergunta_faq"].dropna().tolist())
 
     scoares = (
