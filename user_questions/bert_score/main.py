@@ -1,39 +1,10 @@
 import os
-import re
 import sys
 
 sys.path.append(os.path.dirname(os.path.dirname(__file__)))
-import nltk
 import pandas as pd
 from bert_score import score
-from nltk.corpus import stopwords
-from utils import calculate_scores, fix_excel_table
-
-
-def remove_stopwords(strings: list[str]) -> list[str]:
-    """Removes Portuguese stopwords, greetings and punctuation (except ?)
-    from a list of strings."""
-
-    try:
-        stop_words = set(stopwords.words("portuguese"))
-    except LookupError:
-        nltk.download("stopwords", quiet=True)
-        stop_words = set(stopwords.words("portuguese"))
-
-    greetings = {"bom dia", "boa tarde", "boa noite"}
-
-    def clean_text(text: str) -> str:
-        text_lower = text.lower()
-        for greeting in greetings:
-            text_lower = re.sub(f"{greeting}[!.,]?", "", text_lower)
-        text_lower = re.sub(r"[^\w\s\?]", "", text_lower)
-        return " ".join(
-            word
-            for word in text_lower.split()
-            if word not in stop_words and word.strip()
-        ).strip()
-
-    return [clean_text(text) for text in strings]
+from utils import calculate_scores, fix_excel_table, remove_stopwords
 
 
 def calculate_bert_score(

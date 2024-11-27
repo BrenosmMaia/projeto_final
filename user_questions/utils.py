@@ -1,4 +1,8 @@
+import re
+
+import nltk
 import pandas as pd
+from nltk.corpus import stopwords
 
 
 def fix_excel_table(df: pd.DataFrame) -> pd.DataFrame:
@@ -22,10 +26,38 @@ def fix_excel_table(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
+def remove_stopwords(strings: list[str]) -> list[str]:
+    """Removes Portuguese stopwords, greetings and punctuation (except ?)
+    from a list of strings."""
+
+    try:
+        stop_words = set(stopwords.words("portuguese"))
+    except LookupError:
+        nltk.download("stopwords", quiet=True)
+        stop_words = set(stopwords.words("portuguese"))
+
+    greetings = {"bom dia", "boa tarde", "boa noite"}
+
+    def clean_text(text: str) -> str:
+        text_lower = text.lower()
+        for greeting in greetings:
+            text_lower = re.sub(f"{greeting}[!.,]?", "", text_lower)
+        text_lower = re.sub(r"[^\w\s\?]", "", text_lower)
+        return " ".join(
+            word
+            for word in text_lower.split()
+            if word not in stop_words and word.strip()
+        ).strip()
+
+    return [clean_text(text) for text in strings]
+
+
 def calculate_scores(df: pd.DataFrame) -> pd.DataFrame:
     """Calculate the score of each similarity method."""
 
-    similarity_columns = [col for col in df.columns if col.endswith("_question") and col != "wpp_question"]
+    similarity_columns = [
+        col for col in df.columns if col.endswith("_question") and col != "wpp_question"
+    ]
     results = []
 
     valid_df = df[
