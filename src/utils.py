@@ -90,3 +90,29 @@ def calculate_scores(df: pd.DataFrame) -> pd.DataFrame:
     results_df = results_df.sort_values("score", ascending=False)
 
     return results_df
+
+
+def replace_acronyms(text_list: list[str]) -> list[str]:
+    """Replace acronyms in a list of strings with their full descriptions"""
+
+    acronym_dict = {
+        "ASPLO": "Assessorias Setoriais de Planejamento e Orçamento (ASPLO)",
+        "SIPLAG": "Sistema de Inteligência em Planejamento e Gestão (SIPLAG)",
+        "REDEPLAN": "Rede de Planejamento (REDEPLAN)",
+        "PPA": "Plano Plurianual (PPA)",
+        "SUPLAN": "Superintendência de Planejamento (SUPLAN)",
+        "SUBPLO": "Subsecretaria de Planejamento e Orçamento (SUBPLO)",
+    }
+
+    patterns = {
+        acronym: re.compile(r"\b" + re.escape(acronym) + r"\b", re.IGNORECASE)
+        for acronym in sorted(acronym_dict, key=len, reverse=True)
+    }
+
+    def process_text(text: str) -> str:
+        result = text
+        for acronym, pattern in patterns.items():
+            result = pattern.sub(acronym_dict[acronym], result, 1)
+        return result
+
+    return [process_text(text) for text in text_list]
