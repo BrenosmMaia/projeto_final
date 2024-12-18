@@ -1,0 +1,11 @@
+similarity_method,score,right_questions
+partial_token_sort_ratio,17,"[2, 3, 4, 6, 7, 8, 16, 17, 18, 20, 27, 28, 38, 40, 45, 46, 47]"
+partial_ratio,14,"[1, 2, 4, 7, 16, 18, 20, 27, 28, 30, 38, 40, 42, 45]"
+token_ratio,13,"[2, 3, 4, 7, 8, 14, 16, 17, 18, 27, 28, 38, 45]"
+token_set_ratio,13,"[2, 3, 4, 7, 8, 14, 16, 17, 18, 27, 28, 38, 45]"
+token_sort_ratio,4,"[3, 4, 8, 14]"
+ratio,3,"[8, 14, 45]"
+QRatio,3,"[8, 14, 45]"
+WRatio,3,"[20, 27, 28]"
+partial_token_ratio,2,"[20, 28]"
+partial_token_set_ratio,2,"[20, 28]"
