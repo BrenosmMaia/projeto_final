@@ -109,10 +109,11 @@ def replace_acronyms(text_list: list[str]) -> list[str]:
         for acronym in sorted(acronym_dict, key=len, reverse=True)
     }
 
-    def process_text(text: str) -> str:
+    result_list = []
+    for text in text_list:
         result = text
         for acronym, pattern in patterns.items():
             result = pattern.sub(acronym_dict[acronym], result, 1)
-        return result
+        result_list.append(result)
 
-    return [process_text(text) for text in text_list]
+    return result_list
