@@ -5,6 +5,7 @@ import pandas as pd
 
 sys.path.append(os.path.dirname(os.path.dirname(__file__)))
 from rapidfuzz import fuzz, process, utils
+
 from utils import calculate_scores, fix_excel_table, remove_stopwords
 
 
