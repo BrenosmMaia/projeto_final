@@ -14,8 +14,6 @@ select = [
   "I",
 ]
 
-ignore = ["SIM112"]
-
 [format]
 indent-style = "space"
 quote-style = "double"

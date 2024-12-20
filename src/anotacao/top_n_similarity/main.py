@@ -136,7 +136,7 @@ def main():
                     i,
                     faq,
                     scorer=score,
-                    limit=2,
+                    limit=3,
                     processor=utils.default_process,
                 )
                 for score in scoares
@@ -149,8 +149,6 @@ def main():
 
     methods_scores = calculate_scores(metohds_results)
     methods_scores.to_csv("scores.csv", index=False)
-
-    print(methods_scores)
 
 
 main()
