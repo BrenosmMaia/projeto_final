@@ -73,7 +73,7 @@ def calculate_scores(df: pd.DataFrame) -> pd.DataFrame:
         predictions = valid_df[method].astype(str)
         correct_questions = []
 
-        for idx, (pred, gt_set) in enumerate(zip(predictions, ground_truth_sets)):
+        for idx, (pred, gt_set) in enumerate(zip(predictions, ground_truth_sets, strict=False)):
             if pred in gt_set:
                 correct_questions.append(int(valid_df.iloc[idx]["wpp_question"]))
 

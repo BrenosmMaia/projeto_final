@@ -19,7 +19,7 @@ def process_similarity_results(
     processed_data = []
     scoring_methods = results[0].keys()
 
-    for question, result in zip(wpp_questions, results):
+    for question, result in zip(wpp_questions, results, strict=False):
         row_data = {"wpp_question": question}
 
         for score_name in scoring_methods:
@@ -84,7 +84,7 @@ def calculate_scores(df: pd.DataFrame) -> pd.DataFrame:
         predictions = valid_df[method]
         correct_questions = []
 
-        for idx, (pred, gt_set) in enumerate(zip(predictions, ground_truth_sets)):
+        for idx, (pred, gt_set) in enumerate(zip(predictions, ground_truth_sets, strict=False)):
             pred_list = parse_prediction(pred)
             if any(p in gt_set for p in pred_list):
                 correct_questions.append(int(valid_df.iloc[idx]["wpp_question"]))
