@@ -19,7 +19,7 @@ def process_similarity_results(
 
     scoring_methods = results[0].keys()
 
-    for question, result in zip(wpp_questions, results):
+    for question, result in zip(wpp_questions, results, strict=False):
         row_data = {"wpp_question": question}
 
         for score_name in scoring_methods:

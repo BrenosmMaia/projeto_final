@@ -9,7 +9,7 @@ def create_dataframe(
 
     df_rows = []
 
-    for question, result in zip(user_questions, results):
+    for question, result in zip(user_questions, results, strict=False):
         row = {"user_question": question}
 
         for score_name, matches in result.items():

@@ -18,6 +18,9 @@ dependencies = [
     "tzdata==2024.1.0",
 ]
 
+[tool.ruff]
+line-length = 99
+
 [tool.ruff.lint]
 select = [
   # pycodestyle
