@@ -6,30 +6,23 @@ This project is focused on [ ]
 
 Follow these steps to set up your local environment and start working on the project.
 
-#### 1. Clone the Repository
-
+#### 1. Install uv package manager
 ```bash
-git clone git@github.com:BrenosmMaia/projeto_final.git'
+pip install uv==0.5.11
 ```
 
-#### 2. Create a Virtual Enviroment
+#### 2.Create a virtual environment
 ```bash
-python -m venv venv
+uv venv
 ```
 
-#### 2. Activate the Virtual Enviroment
-##### 2.1. Windows
+#### 2.Actiavte the virtual environment
 ```bash
-.\venv\Scripts\activate
-```
-##### 2.2 macOS and Linux
-```bash
-source venv/bin/activate
+.venv\Scripts\activate
 ```
 
-#### 3. Install Necessary Packages
+#### 3. Install dependencies
 ```bash
-pip install --upgrade pip
-pip install -r requirements.txt
+uv sync
 ```
  
