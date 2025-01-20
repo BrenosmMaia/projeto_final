@@ -92,6 +92,54 @@ def calculate_scores(df: pd.DataFrame) -> pd.DataFrame:
     return results_df
 
 
+def calculate_list_scores(df: pd.DataFrame) -> pd.DataFrame:
+    """Calculate the score of each similarity method."""
+
+    similarity_columns = [
+        col for col in df.columns if col.endswith("_question") and col != "wpp_question"
+    ]
+    results = []
+
+    valid_df = df[
+        ~pd.isna(df["wpp_to_faq_annotation"])
+        & (df["wpp_to_faq_annotation"].str.lower() != "none")
+    ]
+
+    ground_truth_sets = valid_df["wpp_to_faq_annotation"].apply(
+        lambda x: set(map(str.strip, str(x).split(";")))
+    )
+
+    def parse_prediction(pred):
+        try:
+            if isinstance(pred, list):
+                return [str(p) for p in pred]
+        except Exception:
+            return [str(pred)]
+
+    for method in similarity_columns:
+        predictions = valid_df[method]
+        correct_questions = []
+
+        for idx, (pred, gt_set) in enumerate(zip(predictions, ground_truth_sets, strict=False)):
+            pred_list = parse_prediction(pred)
+            if any(p in gt_set for p in pred_list):
+                correct_questions.append(int(valid_df.iloc[idx]["wpp_question"]))
+
+        method_name = method.replace("_question", "")
+        results.append(
+            {
+                "similarity_method": method_name,
+                "score": len(correct_questions),
+                "right_questions": correct_questions,
+            }
+        )
+
+    results_df = pd.DataFrame(results)
+    results_df = results_df.sort_values("score", ascending=False)
+
+    return results_df
+
+
 def replace_acronyms(text_list: list[str]) -> list[str]:
     """Replace acronyms in a list of strings with their full descriptions"""
 
