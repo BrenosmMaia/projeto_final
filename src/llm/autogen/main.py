@@ -8,18 +8,20 @@ from llm_config import llama_bedrock
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..")))
 
-from utils import fix_excel_table, calculate_list_scores
+from utils import calculate_list_scores, fix_excel_table
+
 
 def parse_response(json_block: str) -> dict:
     json_block = json_block.strip()
-    
+
     if json_block.startswith("```json"):
-        json_block = json_block[len("```json"):]
+        json_block = json_block[len("```json") :]
 
     if json_block.endswith("```"):
         json_block = json_block[:-3]
-    
-    return  ast.literal_eval(json_block.strip())
+
+    return ast.literal_eval(json_block.strip())
+
 
 def create_assistants() -> tuple[autogen.ConversableAgent, autogen.ConversableAgent]:
     """Create LLM assistants."""
@@ -32,7 +34,7 @@ representem a pergunta do usuário.
 
 Retorne sempre apenas um Json com o formato:
 {'pergunta': 'pergunta do FAQ', indice: 'indice da pergunta do FAQ', \
-'justicativa': 'justificação da resposta'}
+'justificativa': 'justificação da resposta'}
 
 Não retorne nada além do json.
 """
@@ -54,16 +56,16 @@ Não retorne nada além do json.
 
     return assistant, user_proxy
 
+
 def make_output_csv(df: pd.DataFrame, df_faq_users: pd.DataFrame) -> pd.DataFrame:
     """Process output"""
 
-    df = pd.concat(
-        [df, df_faq_users["wpp_to_faq_annotation"].dropna(how="all")], axis=1
-    )
+    df = pd.concat([df, df_faq_users["wpp_to_faq_annotation"].dropna(how="all")], axis=1)
     last_col = df.pop("wpp_to_faq_annotation")
     df.insert(1, "wpp_to_faq_annotation", last_col)
 
     return df
+
 
 def main():
     all_responses = []
@@ -78,20 +80,24 @@ def main():
     faq = df_faq_users["pergunta_faq"].dropna().tolist()
     faq_formatted = "\n".join([f"{i}: {q}" for i, q in enumerate(faq)])
 
+    assistant, user_proxy = create_assistants()
+
     for i in range(len(wpp_questions)):
 
-        assistant, user_proxy = create_assistants()
+        message = f"""
+        Dado a pergunta de usuário abaixo, quais são as 3 perguntas do FAQ que são mais \
+similares ao que o usuário quer saber?\
 
-        message = f"""\
-            Dado a pergunta de usuário abaixo, quais são as 3 perguntas do FAQ que são mais \
-    similares ao que o usuário quer saber?
+Não faça apenas um match trivial de palavras, e sim encontre as perguntas \
+do FAQ que tem mais em comum com semanticamente com a pergunta do usuário.\
+Sempre retorne 3 perguntas diferentes, mesmo que esteja incerto.
 
-            Pergunta do usuário: {wpp_questions[i]}
-            Perguntas do FAQ:\n{faq_formatted}
+        Pergunta do usuário: {wpp_questions[i]}
+        Perguntas do FAQ:\n{faq_formatted}
 
-            Retorne sempre apenas um Json com o formato:
+        Retorne sempre apenas um Json com o formato:
         {{'indices: ['indices da pergunta do FAQ'], \
-'justicativa': 'justificação da resposta'}}
+'justificativa': 'justificação da resposta'}}
             """
 
         chat_result = user_proxy.initiate_chat(
@@ -101,17 +107,18 @@ def main():
         )
 
         response = parse_response(chat_result.chat_history[1]["content"])
-        response["wpp_question"] = i + 1
-        response['llm_question'] = response.pop('indices') 
+        response["wpp_question"] = int(i + 1)
+        response["llm_question"] = response.pop("indices")
 
         all_responses.append(response)
 
     response = pd.DataFrame(all_responses)
-    response['justicativa'] = response.pop('justicativa')
+    response["justificativa"] = response.pop("justificativa")
     response = make_output_csv(response, df_faq_users)
     response.to_csv("llm_results.csv", index=False)
 
     llm_scores = calculate_list_scores(response)
     llm_scores.to_csv("llm_scores.csv", index=False)
+
 
 main()
