@@ -60,9 +60,11 @@ Não retorne nada além do json.
 def make_output_csv(df: pd.DataFrame, df_faq_users: pd.DataFrame) -> pd.DataFrame:
     """Process output"""
 
-    df = pd.concat([df, df_faq_users["wpp_to_faq_annotation"].dropna(how="all")], axis=1)
-    last_col = df.pop("wpp_to_faq_annotation")
-    df.insert(1, "wpp_to_faq_annotation", last_col)
+    df = pd.concat(
+        [df_faq_users[["n_wpp_questions", "wpp_to_faq_annotation"]].dropna(how="all"), df], axis=1
+    )
+
+    df = df.query("n_wpp_questions != -1")
 
     return df
 
@@ -72,7 +74,7 @@ def main():
 
     df_faq_users = pd.read_excel(
         io="../../../data/Perguntas_chatbot - 09.10_relacao FAQ perguntas users.xlsx",
-        sheet_name="relacao",
+        sheet_name="relacao_clean",
     )
 
     df_faq_users = fix_excel_table(df_faq_users)
@@ -83,7 +85,6 @@ def main():
     assistant, user_proxy = create_assistants()
 
     for i in range(len(wpp_questions)):
-
         message = f"""
         Dado a pergunta de usuário abaixo, quais são as 3 perguntas do FAQ que são mais \
 similares ao que o usuário quer saber?\
@@ -107,7 +108,6 @@ Sempre retorne 3 perguntas diferentes, mesmo que esteja incerto.
         )
 
         response = parse_response(chat_result.chat_history[1]["content"])
-        response["wpp_question"] = int(i + 1)
         response["llm_question"] = response.pop("indices")
 
         all_responses.append(response)

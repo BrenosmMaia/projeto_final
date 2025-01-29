@@ -44,12 +44,44 @@ def remove_stopwords(strings: list[str]) -> list[str]:
             text_lower = re.sub(f"{greeting}[!.,]?", "", text_lower)
         text_lower = re.sub(r"[^\w\s\?]", "", text_lower)
         return " ".join(
-            word
-            for word in text_lower.split()
-            if word not in stop_words and word.strip()
+            word for word in text_lower.split() if word not in stop_words and word.strip()
         ).strip()
 
     return [clean_text(text) for text in strings]
+
+
+def process_similarity_results(
+    wpp_questions: list[str], results: list[dict[str, list[tuple[str, float, int]]]]
+) -> pd.DataFrame:
+    """
+    Process similarity results into a structured DataFrame with dynamic scoring methods,
+    handling multiple matches per scoring method
+    """
+    processed_data = []
+    scoring_methods = results[0].keys()
+
+    for question, result in zip(wpp_questions, results, strict=False):
+        row_data = {"wpp_question": question}
+
+        for score_name in scoring_methods:
+            matches = result[score_name]
+
+            indices = [match[2] + 1 for match in matches]
+            scores = [round(match[1], 2) for match in matches]
+
+            row_data[f"{score_name}_question"] = indices
+            row_data[f"{score_name}_value"] = scores
+
+        processed_data.append(row_data)
+
+    df = pd.DataFrame(processed_data)
+
+    columns = ["wpp_question"]
+
+    for score_name in scoring_methods:
+        columns.extend([f"{score_name}_question", f"{score_name}_value"])
+
+    return df[columns]
 
 
 def calculate_scores(df: pd.DataFrame) -> pd.DataFrame:
@@ -61,8 +93,7 @@ def calculate_scores(df: pd.DataFrame) -> pd.DataFrame:
     results = []
 
     valid_df = df[
-        ~pd.isna(df["wpp_to_faq_annotation"])
-        & (df["wpp_to_faq_annotation"].str.lower() != "none")
+        ~pd.isna(df["wpp_to_faq_annotation"]) & (df["wpp_to_faq_annotation"].str.lower() != "none")
     ]
 
     ground_truth_sets = valid_df["wpp_to_faq_annotation"].apply(
@@ -75,7 +106,7 @@ def calculate_scores(df: pd.DataFrame) -> pd.DataFrame:
 
         for idx, (pred, gt_set) in enumerate(zip(predictions, ground_truth_sets, strict=False)):
             if pred in gt_set:
-                correct_questions.append(int(valid_df.iloc[idx]["wpp_question"]))
+                correct_questions.append(int(valid_df.iloc[idx]["n_wpp_questions"]))
 
         method_name = method.replace("_question", "")
         results.append(
@@ -101,8 +132,7 @@ def calculate_list_scores(df: pd.DataFrame) -> pd.DataFrame:
     results = []
 
     valid_df = df[
-        ~pd.isna(df["wpp_to_faq_annotation"])
-        & (df["wpp_to_faq_annotation"].str.lower() != "none")
+        ~pd.isna(df["wpp_to_faq_annotation"]) & (df["wpp_to_faq_annotation"].str.lower() != "none")
     ]
 
     ground_truth_sets = valid_df["wpp_to_faq_annotation"].apply(
@@ -123,19 +153,20 @@ def calculate_list_scores(df: pd.DataFrame) -> pd.DataFrame:
         for idx, (pred, gt_set) in enumerate(zip(predictions, ground_truth_sets, strict=False)):
             pred_list = parse_prediction(pred)
             if any(p in gt_set for p in pred_list):
-                correct_questions.append(int(valid_df.iloc[idx]["wpp_question"]))
+                correct_questions.append(int(valid_df.iloc[idx]["n_wpp_questions"]))
 
         method_name = method.replace("_question", "")
         results.append(
             {
                 "similarity_method": method_name,
-                "score": len(correct_questions),
+                "accuracy": round(len(correct_questions) / len(ground_truth_sets), 3),
+                "total_questions": len(ground_truth_sets),
                 "right_questions": correct_questions,
             }
         )
 
     results_df = pd.DataFrame(results)
-    results_df = results_df.sort_values("score", ascending=False)
+    results_df = results_df.sort_values("accuracy", ascending=False)
 
     return results_df
 
