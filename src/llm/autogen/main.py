@@ -29,8 +29,7 @@ def create_assistants() -> tuple[autogen.ConversableAgent, autogen.ConversableAg
     system_message = """
     Você é um assistente que irá receber uma pergunta de usuário de \
 um FAQ. Você deve retornar as 3 perguntas do FAQ que são mais similares ao que o usuário \
-quer saber. Use seu conhecimento para entender quais as perguntas do FAQ que melhor\
-representem a pergunta do usuário.
+quer saber.
 
 Retorne sempre apenas um Json com o formato:
 {'pergunta': 'pergunta do FAQ', indice: 'indice da pergunta do FAQ', \
@@ -91,7 +90,7 @@ similares ao que o usuário quer saber?\
 
 Não faça apenas um match trivial de palavras, e sim encontre as perguntas \
 do FAQ que tem mais em comum com semanticamente com a pergunta do usuário.\
-Sempre retorne 3 perguntas diferentes, mesmo que esteja incerto.
+Sempre retorne 3 perguntas diferentes, ordenando da mais similar a menos similar.
 
         Pergunta do usuário: {wpp_questions[i]}
         Perguntas do FAQ:\n{faq_formatted}
