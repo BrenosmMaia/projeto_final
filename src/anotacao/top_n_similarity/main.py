@@ -6,41 +6,12 @@ import pandas as pd
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..")))
 from rapidfuzz import fuzz, process, utils
 
-from utils import fix_excel_table, remove_stopwords, calculate_list_scores
-
-
-def process_similarity_results(
-    wpp_questions: list[str], results: list[dict[str, list[tuple[str, float, int]]]]
-) -> pd.DataFrame:
-    """
-    Process similarity results into a structured DataFrame with dynamic scoring methods,
-    handling multiple matches per scoring method
-    """
-    processed_data = []
-    scoring_methods = results[0].keys()
-
-    for question, result in zip(wpp_questions, results, strict=False):
-        row_data = {"wpp_question": question}
-
-        for score_name in scoring_methods:
-            matches = result[score_name]
-
-            indices = [match[2] + 1 for match in matches]
-            scores = [round(match[1], 2) for match in matches]
-
-            row_data[f"{score_name}_question"] = indices
-            row_data[f"{score_name}_value"] = scores
-
-        processed_data.append(row_data)
-
-    df = pd.DataFrame(processed_data)
-
-    columns = ["wpp_question"]
-
-    for score_name in scoring_methods:
-        columns.extend([f"{score_name}_question", f"{score_name}_value"])
-
-    return df[columns]
+from utils import (
+    calculate_list_scores,
+    fix_excel_table,
+    process_similarity_results,
+    remove_stopwords,
+)
 
 
 def make_output_csv(df: pd.DataFrame, df_faq_users: pd.DataFrame) -> pd.DataFrame:
@@ -51,7 +22,7 @@ def make_output_csv(df: pd.DataFrame, df_faq_users: pd.DataFrame) -> pd.DataFram
     )
 
     df = df.drop("wpp_question", axis=1)
-    df = df.query('n_wpp_questions != -1')
+    df = df.query("n_wpp_questions != -1")
 
     return df
 

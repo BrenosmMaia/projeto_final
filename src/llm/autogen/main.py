@@ -64,7 +64,7 @@ def make_output_csv(df: pd.DataFrame, df_faq_users: pd.DataFrame) -> pd.DataFram
         [df_faq_users[["n_wpp_questions", "wpp_to_faq_annotation"]].dropna(how="all"), df], axis=1
     )
 
-    df = df.query('n_wpp_questions != -1')
+    df = df.query("n_wpp_questions != -1")
 
     return df
 
@@ -85,7 +85,6 @@ def main():
     assistant, user_proxy = create_assistants()
 
     for i in range(len(wpp_questions)):
-
         message = f"""
         Dado a pergunta de usuário abaixo, quais são as 3 perguntas do FAQ que são mais \
 similares ao que o usuário quer saber?\
