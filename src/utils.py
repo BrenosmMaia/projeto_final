@@ -75,7 +75,7 @@ def calculate_scores(df: pd.DataFrame) -> pd.DataFrame:
 
         for idx, (pred, gt_set) in enumerate(zip(predictions, ground_truth_sets, strict=False)):
             if pred in gt_set:
-                correct_questions.append(int(valid_df.iloc[idx]["wpp_question"]))
+                correct_questions.append(int(valid_df.iloc[idx]["n_wpp_questions"]))
 
         method_name = method.replace("_question", "")
         results.append(
@@ -123,20 +123,20 @@ def calculate_list_scores(df: pd.DataFrame) -> pd.DataFrame:
         for idx, (pred, gt_set) in enumerate(zip(predictions, ground_truth_sets, strict=False)):
             pred_list = parse_prediction(pred)
             if any(p in gt_set for p in pred_list):
-                correct_questions.append(int(valid_df.iloc[idx]["wpp_question"]))
+                correct_questions.append(int(valid_df.iloc[idx]["n_wpp_questions"]))
 
         method_name = method.replace("_question", "")
         results.append(
             {
                 "similarity_method": method_name,
-                "accuracy": len(correct_questions),
-                "base": len(ground_truth_sets),
+                "accuracy": round(len(correct_questions) / len(ground_truth_sets), 3),
+                "total_questions": len(ground_truth_sets),
                 "right_questions": correct_questions,
             }
         )
 
     results_df = pd.DataFrame(results)
-    results_df = results_df.sort_values("score", ascending=False)
+    results_df = results_df.sort_values("accuracy", ascending=False)
 
     return results_df
 

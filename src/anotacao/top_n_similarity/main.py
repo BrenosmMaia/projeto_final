@@ -6,7 +6,7 @@ import pandas as pd
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..")))
 from rapidfuzz import fuzz, process, utils
 
-from utils import fix_excel_table, remove_stopwords
+from utils import fix_excel_table, remove_stopwords, calculate_list_scores
 
 
 def process_similarity_results(
@@ -46,62 +46,14 @@ def process_similarity_results(
 def make_output_csv(df: pd.DataFrame, df_faq_users: pd.DataFrame) -> pd.DataFrame:
     """Process output"""
 
-    df["wpp_question"] = range(1, len(df) + 1)
     df = pd.concat(
-        [df, df_faq_users["wpp_to_faq_annotation"].dropna(how="all")], axis=1
+        [df_faq_users[["n_wpp_questions", "wpp_to_faq_annotation"]].dropna(how="all"), df], axis=1
     )
-    last_col = df.pop("wpp_to_faq_annotation")
-    df.insert(1, "wpp_to_faq_annotation", last_col)
+
+    df = df.drop("wpp_question", axis=1)
+    df = df.query('n_wpp_questions != -1')
 
     return df
-
-
-def calculate_scores(df: pd.DataFrame) -> pd.DataFrame:
-    """Calculate the score of each similarity method."""
-
-    similarity_columns = [
-        col for col in df.columns if col.endswith("_question") and col != "wpp_question"
-    ]
-    results = []
-
-    valid_df = df[
-        ~pd.isna(df["wpp_to_faq_annotation"])
-        & (df["wpp_to_faq_annotation"].str.lower() != "none")
-    ]
-
-    ground_truth_sets = valid_df["wpp_to_faq_annotation"].apply(
-        lambda x: set(map(str.strip, str(x).split(";")))
-    )
-
-    def parse_prediction(pred):
-        try:
-            if isinstance(pred, list):
-                return [str(p) for p in pred]
-        except Exception:
-            return [str(pred)]
-
-    for method in similarity_columns:
-        predictions = valid_df[method]
-        correct_questions = []
-
-        for idx, (pred, gt_set) in enumerate(zip(predictions, ground_truth_sets, strict=False)):
-            pred_list = parse_prediction(pred)
-            if any(p in gt_set for p in pred_list):
-                correct_questions.append(int(valid_df.iloc[idx]["wpp_question"]))
-
-        method_name = method.replace("_question", "")
-        results.append(
-            {
-                "similarity_method": method_name,
-                "score": len(correct_questions),
-                "right_questions": correct_questions,
-            }
-        )
-
-    results_df = pd.DataFrame(results)
-    results_df = results_df.sort_values("score", ascending=False)
-
-    return results_df
 
 
 def main():
@@ -147,7 +99,7 @@ def main():
     metohds_results = make_output_csv(metohds_results, df_faq_users)
     metohds_results.to_csv("metohds_results.csv", index=False)
 
-    methods_scores = calculate_scores(metohds_results)
+    methods_scores = calculate_list_scores(metohds_results)
     methods_scores.to_csv("scores.csv", index=False)
 
 
