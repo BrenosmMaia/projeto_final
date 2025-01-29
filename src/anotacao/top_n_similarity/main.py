@@ -107,7 +107,7 @@ def calculate_scores(df: pd.DataFrame) -> pd.DataFrame:
 def main():
     df_faq_users = pd.read_excel(
         io="../../../data/Perguntas_chatbot - 09.10_relacao FAQ perguntas users.xlsx",
-        sheet_name="relacao",
+        sheet_name="relacao_clean",
     )
 
     df_faq_users = fix_excel_table(df_faq_users)

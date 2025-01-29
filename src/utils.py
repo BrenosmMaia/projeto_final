@@ -129,7 +129,8 @@ def calculate_list_scores(df: pd.DataFrame) -> pd.DataFrame:
         results.append(
             {
                 "similarity_method": method_name,
-                "score": len(correct_questions),
+                "accuracy": len(correct_questions),
+                "base": len(ground_truth_sets),
                 "right_questions": correct_questions,
             }
         )
