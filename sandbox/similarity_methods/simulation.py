@@ -23,7 +23,7 @@ def create_match_dataframe(
 
     results = []
 
-    for data, (pergunta_base, pergunta_match) in zip(data_list, pergunta_base_e_match):
+    for data, (pergunta_base, pergunta_match) in zip(data_list, pergunta_base_e_match, strict=False):
         result = {"pergunta_base": pergunta_base, "pergunta_match": pergunta_match}
 
         for ratio_func, tuple_list in data.items():
