@@ -12,9 +12,7 @@ def read_input() -> dict[str, str]:
     return data
 
 
-def make_json_output(
-    data: list[tuple[str, float, int]], filename: str = "output.json"
-) -> None:
+def make_json_output(data: list[tuple[str, float, int]], filename: str = "output.json") -> None:
     """Converts and sorts the output from rapidfuzz.process"""
 
     sorted_data = sorted(data, key=lambda x: x[1], reverse=True)
