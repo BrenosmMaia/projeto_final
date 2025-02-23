@@ -37,18 +37,23 @@ line-length = 99
 
 [tool.ruff.lint]
 select = [
-  # pycodestyle
-  "E",
-  # Pyflakes
-  "F",
-  # pyupgrade
-  "UP",
-  # flake8-bugbear
-  "B",
-  # flake8-simplify
-  "SIM",
-  # isort
-  "I",
+    "B",      # flake8-bugbear
+    "C4",     # Helps you write better list/set/dict comprehensions.
+    "E",      # pycodestyle errors
+    "FA",     # Verifies files use from __future__ import annotations if a type is used in the module that can be rewritten using PEP 563.
+    "F",      # pyflakes
+    "G",      # Better usage of built-in logging
+    "I",      # isort - Import sorting
+    "LOG",    # Checks for issues using the standard library logging module.
+    "PLC",    # pycodestyle conventions
+    "PYI",    # Linting rules for type annotations.
+    "Q",      # Linting rules for quites
+    "RUF100", # Unused noqa directive
+    "TCH",    # Move type only imports to type-checking condition.
+    "TID",    # Helps you write tidier imports.
+    "UP",     # pyupgrade
+    "W",      # pycodestyle warnings
+    "SIM",    # flake8-simplify
 ]
 
 [tool.ruff.format]
