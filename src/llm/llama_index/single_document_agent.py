@@ -1,5 +1,4 @@
 from pathlib import Path
-import textwrap
 
 from llm_config import (
     gpt_4o,
@@ -68,7 +67,7 @@ def get_doc_tools(file_path: str, name: str) -> tuple[FunctionTool, QueryEngineT
         metadata_dicts = [{"key": "page_label", "value": p} for p in page_numbers]
 
         query_engine = vector_index.as_query_engine(
-            similarity_top_k=3,
+            similarity_top_k=2,
             filters=MetadataFilters.from_dicts(metadata_dicts, condition=FilterCondition.OR),
         )
         return str(query_engine.query(query))
@@ -110,21 +109,14 @@ def create_agent(model_type: str = "llama", papers: list[str] = None) -> AgentRu
 
     all_tools = [t for paper in papers for t in paper_to_tools[paper]]
 
-    # Create object index for tools
-    obj_index = ObjectIndex.from_objects(
-        all_tools,
-        index_cls=VectorStoreIndex,
-    )
-    obj_retriever = obj_index.as_retriever(similarity_top_k=3)
-
     # Select appropriate agent worker
     if model_type == "llama":
         agent_worker = ReActAgentWorker.from_tools(
-            tool_retriever=obj_retriever, verbose=True, max_iterations=10
+            all_tools,verbose=True, max_iterations=15
         )
     else:  # openai
         agent_worker = FunctionCallingAgentWorker.from_tools(
-            tool_retriever=obj_retriever, verbose=True
+            all_tools, verbose=True
         )
 
     return AgentRunner(agent_worker)
@@ -133,15 +125,11 @@ def create_agent(model_type: str = "llama", papers: list[str] = None) -> AgentRu
 def main():
     """Main execution function."""
 
-    model_type = "llama"  # Options: "llama" | "openai"
+    model_type = "openai"  # Options: "llama" | "openai"
 
-    query = "Me fale sobre o PPA e SIPLAG"
+    query = "Me fale sobre o PPA"  # Your query here
 
     papers = [
-        "pdfs/manual_de_revisao_ppa_2025.pdf",
-        "pdfs/manual_de_monitoramento_2024-2027.pdf",
-        "pdfs/manual_de_elaboracao_PPA_24-27.pdf",
-        "pdfs/guia_operacional_SIPLAG_PPA_24-27.pdf",
         "pdfs/faq_oficial.pdf",
     ]
 
@@ -158,9 +146,9 @@ def main():
     response = agent.query(query)
     print(f"\nFinal Response:\n{response}")
 
+    # Save output
     with open("output.txt", "w", encoding="utf-8") as f:
-        wrapped_text = textwrap.fill(str(response), width=110)
-        f.write(wrapped_text)
+        f.write(str(response))
 
 
 main()

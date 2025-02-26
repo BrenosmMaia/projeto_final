@@ -1,7 +1,6 @@
-O Plano Plurianual (PPA) é um instrumento de planejamento governamental que estabelece, de forma regionalizada, as diretrizes, objetivos e metas da administração pública para um período de quatro anos. Ele é essencial para a gestão pública, pois orienta a elaboração das leis orçamentárias anuais e busca garantir a continuidade das políticas públicas, independentemente de mudanças de governo.
-
-O PPA é elaborado no primeiro ano de mandato do chefe do Executivo e vigora a partir do segundo ano, estendendo-se até o final do primeiro ano do mandato seguinte. Isso significa que ele cobre um período de quatro anos, permitindo que as ações governamentais tenham continuidade e que os projetos iniciados possam ser concluídos.
-
-O processo de elaboração do PPA envolve a participação de diversos atores, incluindo órgãos governamentais, sociedade civil e outros stakeholders, para garantir que as prioridades definidas reflitam as necessidades e expectativas da população. Além disso, o PPA deve estar alinhado com os planos de longo prazo do governo e com as políticas públicas setoriais.
-
-Em resumo, o PPA é uma ferramenta fundamental para o planejamento estratégico do governo, assegurando que os recursos públicos sejam utilizados de forma eficiente e eficaz para promover o desenvolvimento econômico e social do país.
+O Plano Plurianual (PPA) é um processo conjunto no Estado do Rio de Janeiro, orientado pela Secretaria de
+Estado de Planejamento e Gestão (SEPLAG), que visa planejar e gerenciar os recursos do estado. O Sistema de
+Inteligência de Planejamento e Gestão (SIPLAG) é uma ferramenta utilizada para a elaboração do PPA, permitindo
+a inserção da estrutura programática e fornecendo acesso a informações de planejamento, incluindo a Tabela
+Base do SIPLAG, que contém todos os Programas, Ações e Produtos. Com o SIPLAG, é possível ter uma visão geral
+do planejamento e gestão do estado, o que ajuda a tomar decisões informadas e a alcançar os objetivos do PPA.
