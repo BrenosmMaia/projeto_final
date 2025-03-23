@@ -4,16 +4,14 @@ import pandas as pd
 def load_and_filter_data(file_path: str) -> tuple[pd.DataFrame, pd.DataFrame]:
     """
     Load the CSV data and filter out rows where
-    'A melhor resposta foi útil?' is either empty or 'Não se Aplica'.
+    'A melhor resposta foi útil?' is empty or 'Não se Aplica'.
 
-    Returns a tuple containing:
-      - original_data: The full DataFrame loaded from CSV.
-      - filtered_data: The subset DataFrame with the selected columns and filtered rows.
+    Returns:
+      - original_data: The full DataFrame loaded from the CSV.
+      - filtered_data: The DataFrame with the selected columns and filtered rows.
     """
     original_data = pd.read_csv(file_path)
-    # Select the relevant columns
     relevant_data = original_data[["Qual a melhor resposta?", "A melhor resposta foi útil?"]]
-    # Filter out rows with undesired responses
     filtered_data = relevant_data[
         ~relevant_data["A melhor resposta foi útil?"].isin(["", "Não se Aplica"])
     ]
@@ -24,7 +22,7 @@ def generate_results_dataframe(
     filtered_data: pd.DataFrame, original_data: pd.DataFrame
 ) -> pd.DataFrame:
     """
-    Generate a DataFrame with the evaluation results for LLM 1 and LLM 2.
+    Generate a DataFrame with the results for LLM 1 and LLM 2.
     """
 
     is_useful = filtered_data["A melhor resposta foi útil?"].isin(["SIM", "NÃO"])
@@ -36,13 +34,10 @@ def generate_results_dataframe(
     llm1_useful = is_llm1.sum()
     llm2_useful = is_llm2.sum()
 
-    llm1_correct = (is_llm1 & (useful_responses["A melhor resposta foi útil?"] == "SIM")).sum()
-    llm2_correct = (is_llm2 & (useful_responses["A melhor resposta foi útil?"] == "SIM")).sum()
-
     total_evaluated = len(useful_responses)
 
-    llm1_accuracy = round((llm1_correct / total_evaluated) * 100, 3) if total_evaluated > 0 else 0
-    llm2_accuracy = round((llm2_correct / total_evaluated) * 100, 3) if total_evaluated > 0 else 0
+    llm1_accuracy = round((llm1_useful / total_evaluated) * 100, 3) if total_evaluated > 0 else 0
+    llm2_accuracy = round((llm2_useful / total_evaluated) * 100, 3) if total_evaluated > 0 else 0
 
     total_respostas = (original_data["Resposta LLM 1"].fillna("").str.len() >= 5).sum()
 
