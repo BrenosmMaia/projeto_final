@@ -111,13 +111,9 @@ def create_agent(model_type: str = "llama", papers: list[str] = None) -> AgentRu
 
     # Select appropriate agent worker
     if model_type == "llama":
-        agent_worker = ReActAgentWorker.from_tools(
-            all_tools,verbose=True, max_iterations=15
-        )
+        agent_worker = ReActAgentWorker.from_tools(all_tools, verbose=True, max_iterations=15)
     else:  # openai
-        agent_worker = FunctionCallingAgentWorker.from_tools(
-            all_tools, verbose=True
-        )
+        agent_worker = FunctionCallingAgentWorker.from_tools(all_tools, verbose=True)
 
     return AgentRunner(agent_worker)
 
