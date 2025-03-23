@@ -18,6 +18,15 @@ llama = OpenAILike(
     temperature=0.1,
 )
 
+deepseek = OpenAILike(
+    api_base="https://api.llama-api.com",
+    api_key=os.getenv("LLAMA_API_KEY"),
+    model="deepseek-r1",
+    is_function_calling_model=True,
+    is_chat_model=True,
+    temperature=0.1,
+)
+
 
 hugging_face_embedding = HuggingFaceEmbedding(
     model_name="BAAI/bge-small-en-v1.5",

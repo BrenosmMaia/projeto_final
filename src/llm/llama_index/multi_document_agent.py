@@ -5,6 +5,7 @@ from llm_config import (
     gpt_4o,
     hugging_face_embedding,
     llama,
+    deepseek,
     openai_embedding,
 )
 
@@ -25,17 +26,21 @@ def initialize_settings(model_type: str = "llama") -> None:
     """Initialize global settings for LLM and embeddings.
 
     Args:
-        model_type: Type of model to use ('llama' or 'openai')
+        model_type: Type of model to use ('llama', deepseek', 'openai')
     """
     if model_type == "llama":
         Settings.llm = llama
         Settings.embed_model = hugging_face_embedding
-        Settings.context_window = 128_000
+    elif model_type == "deepseek":
+        Settings.llm = deepseek
+        Settings.embed_model = hugging_face_embedding
     elif model_type == "openai":
         Settings.llm = gpt_4o
         Settings.embed_model = openai_embedding
     else:
         raise ValueError(f"Unsupported model type: {model_type}")
+
+    Settings.context_window = 128_000
 
 
 def get_doc_tools(file_path: str, name: str) -> tuple[FunctionTool, QueryEngineTool]:
@@ -48,7 +53,7 @@ def get_doc_tools(file_path: str, name: str) -> tuple[FunctionTool, QueryEngineT
     Returns:
         Tuple of (vector query tool, summary query tool)
     """
-    # Load and process document
+
     documents = SimpleDirectoryReader(input_files=[file_path]).load_data()
     splitter = SentenceSplitter(chunk_size=1024)
     nodes = splitter.get_nodes_from_documents(documents)
@@ -115,16 +120,18 @@ def create_agent(model_type: str = "llama", papers: list[str] = None) -> AgentRu
         all_tools,
         index_cls=VectorStoreIndex,
     )
-    obj_retriever = obj_index.as_retriever(similarity_top_k=3)
+    obj_retriever = obj_index.as_retriever(similarity_top_k=4)
 
-    # Select appropriate agent worker
-    if model_type == "llama":
+    if model_type in ["llama", "deepseek"]:
         agent_worker = ReActAgentWorker.from_tools(
             tool_retriever=obj_retriever, verbose=True, max_iterations=10
         )
-    else:  # openai
+    elif model_type in ["openai"]:
         agent_worker = FunctionCallingAgentWorker.from_tools(
-            tool_retriever=obj_retriever, verbose=True
+            tool_retriever=obj_retriever,
+            verbose=True,
+            system_prompt="Use as informações dos documentos disponíveis em tools \
+para responder o usuário corretamente e detalhadamente, porém não seja longo demais",
         )
 
     return AgentRunner(agent_worker)
@@ -133,34 +140,36 @@ def create_agent(model_type: str = "llama", papers: list[str] = None) -> AgentRu
 def main():
     """Main execution function."""
 
-    model_type = "llama"  # Options: "llama" | "openai"
-
-    query = "Me fale sobre o PPA e SIPLAG"
+    model_type = "deepseek"  # Options: "llama" | "deepseek" | "openai"
 
     papers = [
-        "pdfs/manual_de_revisao_ppa_2025.pdf",
-        "pdfs/manual_de_monitoramento_2024-2027.pdf",
+        "pdfs/manual_de_revisao_PPA_2025.pdf",
+        "pdfs/manual_de_monitoramento_PPA_2024-2027.pdf",
         "pdfs/manual_de_elaboracao_PPA_24-27.pdf",
         "pdfs/guia_operacional_SIPLAG_PPA_24-27.pdf",
-        "pdfs/faq_oficial.pdf",
+        "pdfs/faq_PPA_SIPLAG.pdf",
     ]
 
-    # Validate model choice
-    valid_models = ["llama", "openai"]
+    valid_models = ["llama", "openai", "deepseek"]
     if model_type not in valid_models:
         raise ValueError(f"Invalid model type. Choose from: {', '.join(valid_models)}")
 
-    # Initialize components
     initialize_settings(model_type)
+
     agent = create_agent(model_type, papers)
 
-    # Execute query
+    query = """
+Apenas aparece o 1 e 2 quadrimestre. No email recebido, solicita-se que os dados sejam lançados no sistema... Já está disponível para lançamento ou é necessário esperar uma data específica?
+"""
+
     response = agent.query(query)
     print(f"\nFinal Response:\n{response}")
 
     with open("output.txt", "w", encoding="utf-8") as f:
-        wrapped_text = textwrap.fill(str(response), width=110)
-        f.write(wrapped_text)
+        lines = str(response).split("\n")
+        for line in lines:
+            wrapped_line = textwrap.fill(line, width=110)
+            f.write(wrapped_line + "\n")
 
 
 main()
