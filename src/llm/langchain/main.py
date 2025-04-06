@@ -7,7 +7,6 @@ from typing import TypedDict
 
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 
-# LangChain Components
 from langchain_community.document_loaders import PyPDFLoader
 from langchain_community.vectorstores import FAISS
 from langchain_core.documents import Document
@@ -15,10 +14,7 @@ from langchain_huggingface import HuggingFaceEmbeddings
 
 from langgraph.graph import END, StateGraph
 
-# --- Import the LLM initializer ---
 from llm_config import SYSTEM_PROMPT, initialize_llama_api_llm, EMBEDDING_MODEL_NAME
-
-EMBEDDING_MODEL_NAME = "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
 
 try:
     llm = initialize_llama_api_llm()
@@ -81,16 +77,13 @@ def load_and_process_pdfs(pdf_paths: list[str], embedding_model_name: str):
         return None
 
 
-# --- 3. LangGraph Agent State (Remains the same) ---
 class AgentState(TypedDict):
     query: str
     documents: list[str]
     generation: str
     iterations: int
 
-
-# --- 4. LangGraph Nodes (Remain the same, using the global 'llm' instance) ---
-retriever = None  # Will be initialized in main
+retriever = None 
 
 
 def retrieve_docs(state: AgentState) -> AgentState:
@@ -150,7 +143,6 @@ Answer:"""
 
     print("Generating answer with LLM...")
     try:
-        # Use the globally initialized llm instance
         response = llm.invoke(prompt)
         generation = response.content
         print(f"LLM Generation: {generation}")
@@ -190,7 +182,6 @@ def decide_to_generate(state: AgentState) -> str:
         return "fallback"
 
 
-# --- 6. Build the LangGraph Graph (Remains the same) ---
 print("\n--- Building Agent Graph ---")
 workflow = StateGraph(AgentState)
 
@@ -227,7 +218,6 @@ if __name__ == "__main__":
         print("\nError: No PDF file paths provided in the 'pdf_file_paths' list.")
         sys.exit(1)
 
-    # Initialize the global retriever variable
     retriever = load_and_process_pdfs(pdf_file_paths, EMBEDDING_MODEL_NAME)
 
     if retriever is None:
