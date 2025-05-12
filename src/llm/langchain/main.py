@@ -212,6 +212,8 @@ if __name__ == "__main__":
         "../llama_index/pdfs/manual_de_elaboracao_PPA_24-27.pdf",
         "../llama_index/pdfs/guia_operacional_SIPLAG_PPA_24-27.pdf",
         "../llama_index/pdfs/faq_PPA_SIPLAG.pdf",
+        "../llama_index/pdfs/decreto_ASPLOS.pdf",
+        "../llama_index/pdfs/resolucao_monitoramento_2025_ppa",
     ]
 
     if not pdf_file_paths:
