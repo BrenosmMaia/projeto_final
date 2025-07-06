@@ -42,12 +42,9 @@ def main():
         fuzz.partial_ratio,
         fuzz.token_sort_ratio,
         fuzz.token_set_ratio,
-        fuzz.token_ratio,
         fuzz.partial_token_sort_ratio,
         fuzz.partial_token_set_ratio,
-        fuzz.partial_token_ratio,
         fuzz.WRatio,
-        fuzz.QRatio,
     )
 
     results = []
