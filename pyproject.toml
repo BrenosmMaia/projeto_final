@@ -31,6 +31,7 @@ dependencies = [
     "openpyxl==3.1.0",
     "pandas==2.2.0",
     "pip>=25.0.1",
+    "pyarrow>=20.0.0",
     "pypdf>=5.3.0",
     "python-dateutil==2.9.0",
     "python-dotenv>=1.0.1",
@@ -44,7 +45,7 @@ dependencies = [
 ]
 
 [tool.ruff]
-line-length = 99
+line-length = 110
 
 [tool.ruff.lint]
 select = [
