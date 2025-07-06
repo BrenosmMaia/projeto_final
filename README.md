@@ -6,9 +6,9 @@ This project is focused on [ ]
 
 Follow these steps to set up your local environment and start working on the project.
 
-#### 1. Install uv package manager
+#### 1. Install uv package manager (Requires pipx)
 ```bash
-pip install uv==0.5.11
+pipx install uv~=0.7.19
 ```
 
 #### 2.Create a virtual environment
@@ -17,6 +17,11 @@ uv venv
 ```
 
 #### 2.Actiavte the virtual environment
+**On macOS or Linux:**
+```bash
+source .venv/bin/activate
+```
+**On Windows:**
 ```bash
 .venv\Scripts\activate
 ```
