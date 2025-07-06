@@ -29,7 +29,7 @@ def make_output_csv(df: pd.DataFrame, df_faq_users: pd.DataFrame) -> pd.DataFram
 
 def main():
     df_faq_users = pd.read_excel(
-        io="../../../data/Perguntas_chatbot - 09.10_relacao FAQ perguntas users.xlsx",
+        io="../../../data/Perguntas_chatbot_clean - 09.10_relacao FAQ perguntas users.xlsx",
         sheet_name="relacao_clean",
     )
 
