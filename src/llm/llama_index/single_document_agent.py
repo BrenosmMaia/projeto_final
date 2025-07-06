@@ -15,7 +15,6 @@ from llama_index.core import (
 )
 from llama_index.core.agent import AgentRunner, FunctionCallingAgentWorker, ReActAgentWorker
 from llama_index.core.node_parser import SentenceSplitter
-from llama_index.core.objects import ObjectIndex
 from llama_index.core.tools import FunctionTool, QueryEngineTool
 from llama_index.core.vector_stores import FilterCondition, MetadataFilters
 

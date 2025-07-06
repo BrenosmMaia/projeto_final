@@ -1,11 +1,11 @@
-from pathlib import Path
 import textwrap
+from pathlib import Path
 
 from llm_config import (
+    deepseek,
     gpt_4o,
     hugging_face_embedding,
     llama,
-    deepseek,
     openai_embedding,
 )
 

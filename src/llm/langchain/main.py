@@ -1,20 +1,15 @@
 import os
 import sys
 import traceback
-
-
 from typing import TypedDict
 
 from langchain.text_splitter import RecursiveCharacterTextSplitter
-
 from langchain_community.document_loaders import PyPDFLoader
 from langchain_community.vectorstores import FAISS
 from langchain_core.documents import Document
 from langchain_huggingface import HuggingFaceEmbeddings
-
 from langgraph.graph import END, StateGraph
-
-from llm_config import SYSTEM_PROMPT, initialize_llama_api_llm, EMBEDDING_MODEL_NAME
+from llm_config import EMBEDDING_MODEL_NAME, SYSTEM_PROMPT, initialize_llama_api_llm
 
 try:
     llm = initialize_llama_api_llm()
