@@ -83,7 +83,8 @@ class AgentState(TypedDict):
     generation: str
     iterations: int
 
-retriever = None 
+
+retriever = None
 
 
 def retrieve_docs(state: AgentState) -> AgentState:
