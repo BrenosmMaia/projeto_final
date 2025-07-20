@@ -1,0 +1,2 @@
+similarity_method,accuracy,total_questions,right_questions
+bert_score,0.346,26,"[2, 3, 4, 6, 7, 12, 14, 22, 26]"
