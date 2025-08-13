@@ -1,6 +1,6 @@
 # Final Project
 
-This project is focused on [ ]
+The objective of this project is to create an automated FAQ in the context of public administration.
 
 ## Getting Started
 
